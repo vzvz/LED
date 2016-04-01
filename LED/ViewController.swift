@@ -22,6 +22,9 @@ class ViewController: UIViewController {
         print("Did receive memory warning.")
     }
 
+    @IBAction func sliderValueChanged(sender: UISlider) {
+        print("Slider value changed: \(sender.value)")
+    }
 
 }
 
