@@ -10,9 +10,13 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var slider: UISlider!
+    @IBOutlet weak var label: UILabel!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        updateLabel()
         print("View did load.")
     }
 
@@ -23,8 +27,15 @@ class ViewController: UIViewController {
     }
 
     @IBAction func sliderValueChanged(sender: UISlider) {
-        print("Slider value changed: \(sender.value)")
+        if (sender == self.slider) {
+            updateLabel()
+        }
+    }
+
+    func updateLabel() {
+        let int = Int(self.slider.value)
+        let string = String(int)
+        label.text! = "\(string) W"
     }
 
 }
-
