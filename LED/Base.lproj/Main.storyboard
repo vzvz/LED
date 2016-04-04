@@ -19,7 +19,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="40" translatesAutoresizingMaskIntoConstraints="NO" id="GNm-bY-Smm">
-                                <rect key="frame" x="38" y="40" width="524" height="31"/>
+                                <rect key="frame" x="38" y="265" width="524" height="31"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="X9R-o9-1Es"/>
                                     <constraint firstAttribute="height" constant="30" id="ZE5-dK-Wrk"/>
@@ -35,11 +35,8 @@
                                     <action selector="sliderValueChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="5uw-JQ-W05"/>
                                 </connections>
                             </slider>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c7Q-Ol-Skt">
-                                <rect key="frame" x="279" y="90" width="42" height="21"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="Fvo-g3-Kxv"/>
-                                </constraints>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 W" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c7Q-Ol-Skt">
+                                <rect key="frame" x="284.5" y="315" width="31" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
@@ -48,10 +45,10 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailingMargin" secondItem="GNm-bY-Smm" secondAttribute="trailing" constant="20" id="7Wv-ZC-RtL"/>
-                            <constraint firstItem="GNm-bY-Smm" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" constant="40" id="Ckz-Dg-qkF"/>
-                            <constraint firstItem="c7Q-Ol-Skt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Hdh-EQ-TeQ"/>
-                            <constraint firstItem="c7Q-Ol-Skt" firstAttribute="top" secondItem="GNm-bY-Smm" secondAttribute="bottom" constant="20" id="Nji-QG-M66"/>
+                            <constraint firstItem="c7Q-Ol-Skt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="VQW-n6-7Ds"/>
+                            <constraint firstItem="GNm-bY-Smm" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="-20" id="WfT-FS-f3f"/>
                             <constraint firstItem="GNm-bY-Smm" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="20" id="Wqk-ii-rY9"/>
+                            <constraint firstItem="c7Q-Ol-Skt" firstAttribute="top" secondItem="GNm-bY-Smm" secondAttribute="bottom" constant="20" id="k27-rG-2fh"/>
                         </constraints>
                     </view>
                     <connections>
@@ -61,6 +58,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="375" y="567"/>
         </scene>
     </scenes>
 </document>
