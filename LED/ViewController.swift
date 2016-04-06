@@ -16,6 +16,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
 
     private var centralMananger: CBCentralManager?
     private var discoveredPeripheral: CBPeripheral?
+    private var discoveredCharacteristic: CBCharacteristic?
 
     private let ServiceUUID = CBUUID(string: "E20A39F4-73F5-4BC4-A12F-17D1AD666661")
     private let CharacteristicUUID = CBUUID(string: "08590F7E-DB05-467E-8757-72F6F66666D4")
@@ -26,6 +27,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         super.viewDidLoad()
 
         centralMananger = CBCentralManager(delegate: self, queue: nil)
+        slider.enabled = false
+        label.text = "Not yet connected."
         print("Central manager initalized.")
     }
 
@@ -53,6 +56,11 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     @IBAction func sliderValueChanged(sender: UISlider) {
         if sender == self.slider {
             updateLabel()
+            if let peripheral = discoveredPeripheral, characteristic = discoveredCharacteristic {
+                var intValue = Int(sender.value)
+                let data = NSData(bytes: &intValue, length: sizeof(Int))
+                peripheral.writeValue(data, forCharacteristic: characteristic, type: CBCharacteristicWriteType.WithoutResponse)
+            }
         }
     }
 
@@ -66,17 +74,31 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         print("Scanning started.")
     }
 
+    /**
+     * Cancels any subscriptions to characteristics and disconnects from the peripheral.
+     */
     func clean() {
-        if let services = discoveredPeripheral?.services {
-            for service in services {
-                if let characteristics = service.characteristics {
-                    for characteristic in characteristics {
-                        if characteristic.UUID == CharacteristicUUID {
+        /*
+        guard let peripheral = discoveredPeripheral, services = peripheral.services else {
+            return
+        }
 
-                        }
-                    }
-                }
+        for service in services {
+            guard let characteristics = service.characteristics else {
+                continue
             }
+
+            for characteristic in characteristics where characteristic.UUID == CharacteristicUUID && characteristic.isNotifying {
+                peripheral.setNotifyValue(false, forCharacteristic: characteristic)
+                return
+            }
+        }
+
+        centralMananger?.cancelPeripheralConnection(peripheral)
+        */
+
+        if let central = centralMananger, peripheral = discoveredPeripheral {
+            central.cancelPeripheralConnection(peripheral)
         }
     }
 
@@ -88,11 +110,9 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     func centralManagerDidUpdateState(central: CBCentralManager) {
         print("Central manager did update state: \(central.state)")
 
-        if central.state != .PoweredOn {
-            return
+        if central.state == .PoweredOn {
+            scan()
         }
-
-        scan()
     }
 
     /**
@@ -114,8 +134,78 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         }
     }
 
+    /**
+     * Cleans and disconnects everything on fail.
+     */
     func centralManager(central: CBCentralManager, didFailToConnectPeripheral peripheral: CBPeripheral, error: NSError?) {
         print("Failed to connect to peripheral \(peripheral.name): \(error?.description).")
+        clean()
+    }
+
+    /**
+     * We successfully connected to a peripheral. Time to discover the service.
+     */
+    func centralManager(central: CBCentralManager, didConnectPeripheral peripheral: CBPeripheral) {
+        print("Peripheral connected.")
+
+        centralMananger?.stopScan()
+        print("Scanning stopped.")
+
+        peripheral.delegate = self
+        peripheral.discoverServices([ServiceUUID])
+    }
+
+    /**
+     * Dereference peripheral and characteristic after disconnect.
+     */
+    func centralManager(central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: NSError?) {
+        print("Peripheral disconnected.")
+        discoveredPeripheral = nil
+        discoveredCharacteristic = nil
+        slider.enabled = false
+        label.text = "Disconnected"
+        scan()
+    }
+
+    /**
+     * Services has been discovered - lets discover their characteristics.
+     */
+    func peripheral(peripheral: CBPeripheral, didDiscoverServices error: NSError?) {
+        if let error = error {
+            print("Failed to discover service: \(error.description).")
+            clean()
+        } else if let services = peripheral.services {
+            for service in services where service.UUID == ServiceUUID {
+                peripheral.discoverCharacteristics([CharacteristicUUID], forService: service)
+            }
+        }
+    }
+
+    /**
+     * Characteristics has been discovered - register for value change notifications.
+     */
+    func peripheral(peripheral: CBPeripheral, didDiscoverCharacteristicsForService service: CBService, error: NSError?) {
+        if let error = error {
+            print("Failed to discover characteristics: \(error.description).")
+            clean()
+            return
+        }
+
+        if let characteristics = service.characteristics {
+            for characteristic in characteristics where characteristic.UUID == CharacteristicUUID {
+                // peripheral.setNotifyValue(true, forCharacteristic: characteristic)
+                discoveredCharacteristic = characteristic
+                slider.enabled = true
+                if let data = characteristic.value {
+                    var intValue = -1
+                    data.getBytes(&intValue, length: sizeof(Int))
+                    if intValue != -1 {
+                        label.text = "\(intValue) W"
+                    }
+                }
+                return
+            }
+        }
     }
 
 }
