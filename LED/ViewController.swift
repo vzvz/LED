@@ -18,8 +18,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     private var discoveredPeripheral: CBPeripheral?
     private var discoveredCharacteristic: CBCharacteristic?
 
-    private let ServiceUUID = CBUUID(string: "E20A39F4-73F5-4BC4-A12F-17D1AD666661")
-    private let CharacteristicUUID = CBUUID(string: "08590F7E-DB05-467E-8757-72F6F66666D4")
+    private let ServiceUUID = CBUUID(string: "E20A39F4-73F5-4BC4-A12F-17D1AD07A961")
+    private let CharacteristicUUID = CBUUID(string: "08590F7E-DB05-467E-8757-72F6FAEB13D4")
 
     // UIViewController delegates.
 
@@ -119,10 +119,10 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
      * Checks peripherals discovered in scan() and connects to the first valid one.
      */
     func centralManager(central: CBCentralManager, didDiscoverPeripheral peripheral: CBPeripheral, advertisementData: [String : AnyObject], RSSI: NSNumber) {
-        if RSSI.integerValue > -15 || RSSI.integerValue < -35 {
+        /*if RSSI.integerValue > -15 || RSSI.integerValue < -35 {
             print("Peripheral signal strength is invalid.")
             return
-        }
+        }*/
 
         print("Discovered peripheral \(peripheral.name) at \(RSSI.integerValue).")
 
@@ -196,13 +196,17 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 // peripheral.setNotifyValue(true, forCharacteristic: characteristic)
                 discoveredCharacteristic = characteristic
                 slider.enabled = true
+
+                var intValue = -1
                 if let data = characteristic.value {
-                    var intValue = -1
                     data.getBytes(&intValue, length: sizeof(Int))
-                    if intValue != -1 {
-                        label.text = "\(intValue) W"
-                    }
                 }
+                if intValue != -1 {
+                    label.text = "\(intValue) W"
+                } else {
+                    label.text = "Connected"
+                }
+
                 return
             }
         }
