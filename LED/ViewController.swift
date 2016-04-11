@@ -28,11 +28,13 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
 
     @IBAction func sliderValueChanged(sender: UISlider) {
         var int = Int(slider.value)
-        label.text = "\(int) W"
+        if int >= 0 && int <= 100 {
+            label.text = "\(int) %"
 
-        if let peripheral = peripheral, characteristic = characteristic {
-            let data = NSData(bytes: &int, length: sizeof(Int))
-            peripheral.writeValue(data, forCharacteristic: characteristic, type: CBCharacteristicWriteType.WithoutResponse)
+            if let peripheral = peripheral, characteristic = characteristic {
+                let data = NSData(bytes: &int, length: sizeof(Int))
+                peripheral.writeValue(data, forCharacteristic: characteristic, type: CBCharacteristicWriteType.WithoutResponse)
+            }
         }
     }
 
