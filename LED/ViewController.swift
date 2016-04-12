@@ -14,12 +14,16 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     @IBOutlet weak var slider: UISlider!
     @IBOutlet weak var label: UILabel!
 
-    private let ServiceUUID = CBUUID(string: "E20A39F4-73F5-4BC4-A12F-17D1AD07A961")
-    private let CharacteristicUUID = CBUUID(string: "08590F7E-DB05-467E-8757-72F6FAEB13D4")
-
     private var central: CBCentralManager?
+
+    private let ServiceUUID = CBUUID(string: "E20A39F4-73F5-4BC4-A12F-17D1AD07A961")
     private var peripheral: CBPeripheral?
-    private var characteristic: CBCharacteristic?
+
+    private let PowerCharacteristicUUID = CBUUID(string: "08590F7E-DB05-467E-8757-72F6FAEB13D4")
+    private var powerCharacteristic: CBCharacteristic?
+
+    private let TemperatureCharacteristicUUID = CBUUID(string: "73B80A43-058C-464D-A9A9-4C904A27B559")
+    private var temperatureCharacteristic: CBCharacteristic?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,16 +35,16 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         if int >= 0 && int <= 20 {
             label.text = "\(int * 5) %"
 
-            if let peripheral = peripheral, characteristic = characteristic {
+            if let peripheral = peripheral, powerCharacteristic = powerCharacteristic {
                 let data = NSData(bytes: &int, length: sizeof(UInt8))
-                peripheral.writeValue(data, forCharacteristic: characteristic, type: CBCharacteristicWriteType.WithoutResponse)
+                peripheral.writeValue(data, forCharacteristic: powerCharacteristic, type: CBCharacteristicWriteType.WithoutResponse)
             }
         }
     }
 
     private func reset() {
         self.peripheral = nil
-        self.characteristic = nil
+        self.powerCharacteristic = nil
         slider.enabled = false
         label.text = "Disconnected"
     }
@@ -97,7 +101,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             disconnect()
         } else if let services = peripheral.services {
             for service in services where service.UUID == ServiceUUID {
-                peripheral.discoverCharacteristics([CharacteristicUUID], forService: service)
+                peripheral.discoverCharacteristics([PowerCharacteristicUUID], forService: service)
                 label.text = "Discovering characteristics..."
                 break
             }
@@ -108,8 +112,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         if let _ = error {
             disconnect()
         } else if let characteristics = service.characteristics {
-            for characteristic in characteristics where characteristic.UUID == CharacteristicUUID {
-                self.characteristic = characteristic
+            for characteristic in characteristics where characteristic.UUID == PowerCharacteristicUUID {
+                self.powerCharacteristic = characteristic
                 slider.enabled = true
                 label.text = "Connected"
                 break
